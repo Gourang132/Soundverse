@@ -749,16 +749,45 @@ function playSong(i){
 // ═══════════════════════════════════
 // SEARCH — Invidious
 // ═══════════════════════════════════
-const HOSTS=['https://invidious.io.lol','https://iv.datura.network','https://invidious.privacydev.net','https://yt.cdaut.de','https://invidious.nerdvpn.de'];
+// ── Piped API instances (primary — best CORS support)
+const PIPED=['https://pipedapi.kavin.rocks','https://pipedapi.tokhmi.xyz','https://piped-api.garudalinux.org','https://api.piped.yt'];
+// ── Invidious fallback
+const INVIDIOUS=['https://invidious.io.lol','https://iv.datura.network','https://yt.cdaut.de','https://invidious.privacydev.net'];
+
 async function ytSearch(q){
-  for(const h of HOSTS){
+  // 1. Try Piped instances
+  for(const h of PIPED){
     try{
-      const r=await fetch(`${h}/api/v1/search?q=${encodeURIComponent(q)}&type=video&fields=videoId,title,author,lengthSeconds,videoThumbnails`,{signal:AbortSignal.timeout(6000)});
+      const r=await fetch(`${h}/search?q=${encodeURIComponent(q)}&filter=videos`,{signal:AbortSignal.timeout(7000)});
+      if(!r.ok)continue;
+      const d=await r.json();
+      const items=d?.items||d?.results||[];
+      if(items.length){
+        return items.slice(0,24).map(v=>({
+          videoId:(v.url||v.videoId||'').replace('/watch?v=',''),
+          title:v.title||'Unknown',
+          author:v.uploaderName||v.author||'Unknown',
+          lengthSeconds:v.duration||0,
+          videoThumbnails:[{quality:'medium',url:v.thumbnail||`https://i.ytimg.com/vi/${(v.url||'').replace('/watch?v=','')}/mqdefault.jpg`}]
+        })).filter(v=>v.videoId);
+      }
+    }catch{continue}
+  }
+  // 2. Try Invidious fallback
+  for(const h of INVIDIOUS){
+    try{
+      const r=await fetch(`${h}/api/v1/search?q=${encodeURIComponent(q)}&type=video&fields=videoId,title,author,lengthSeconds,videoThumbnails`,{signal:AbortSignal.timeout(7000)});
       if(!r.ok)continue;
       const d=await r.json();
       if(Array.isArray(d)&&d.length)return d.slice(0,24);
     }catch{continue}
   }
+  // 3. CORS proxy fallback over Invidious
+  try{
+    const target=`https://invidious.io.lol/api/v1/search?q=${encodeURIComponent(q)}&type=video&fields=videoId,title,author,lengthSeconds,videoThumbnails`;
+    const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(target)}`,{signal:AbortSignal.timeout(8000)});
+    if(r.ok){const w=await r.json();const d=JSON.parse(w.contents||'[]');if(Array.isArray(d)&&d.length)return d.slice(0,24);}
+  }catch{}
   return null;
 }
 
@@ -778,7 +807,7 @@ async function sgenre(q,label){
   $('rcontainer').innerHTML=`<div class="ld"><div class="sp">◌</div><span style="font-size:13px;color:var(--muted)">Searching...</span></div>`;
   mobileTab('search');
   const res=await ytSearch(q);
-  if(!res?.length){$('rcontainer').innerHTML=`<div class="em"><span style="font-size:44px">🌌</span><span style="font-size:16px;font-weight:700">Nothing found</span><span>Try different keywords</span></div>`;return}
+  if(!res?.length){$('rcontainer').innerHTML=`<div class="em"><span style="font-size:44px">🌐</span><span style="font-size:16px;font-weight:700">API unreachable</span><span style="font-size:12px;text-align:center;line-height:1.6">Free YouTube API is temporarily down.<br/>Try again in a few seconds.</span><button onclick="sgenre(document.getElementById('sinput').value,'Retrying...')" style="margin-top:12px;background:var(--green);color:#000;border:none;border-radius:20px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer">↻ Retry</button></div>`;return}
   Q=res.map(r=>({id:r.videoId,title:r.title,artist:r.author,thumb:r.videoThumbnails?.find(t=>t.quality==='medium')?.url||r.videoThumbnails?.[0]?.url||'',duration:r.lengthSeconds||0}));
   buildCards('rcontainer');
 }

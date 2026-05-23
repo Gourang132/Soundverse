@@ -326,7 +326,7 @@ img{display:block}
   background:#1a1a1a;border:1px solid rgba(255,255,255,.1);
   border-radius:20px;padding:28px;max-width:460px;width:100%;position:relative;max-height:90vh;overflow-y:auto
 }
-.dclose{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:22px}
+.kmodal-wrap{display:none}.kmodal-wrap.open{display:flex}
 .dtitle{font-size:20px;font-weight:800;margin-bottom:4px}
 .dsub{font-size:12px;color:var(--muted);margin-bottom:22px}
 .dopt{border-radius:12px;padding:14px;margin-bottom:12px}
@@ -385,6 +385,53 @@ img{display:block}
 <canvas id="c3d"></canvas>
 <div id="yt-player" style="position:fixed;bottom:0;right:0;width:1px;height:1px;opacity:0;pointer-events:none"></div>
 <div id="toast"></div>
+
+<!-- API KEY MODAL -->
+<div id="kmodal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px"
+  class="kmodal-wrap">
+  <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto">
+    <div style="font-size:22px;font-weight:900;margin-bottom:4px" id="kmodal-title">🔑 One-Time Setup</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:22px" id="kmodal-sub">You need a free YouTube API key. Takes 2 minutes. Free forever (100 searches/day).</div>
+
+    <div style="background:rgba(30,215,96,.07);border:1px solid rgba(30,215,96,.2);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--green);letter-spacing:1px;margin-bottom:12px">HOW TO GET YOUR FREE KEY</div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--green);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">1</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5">Go to <strong style="color:var(--text);cursor:pointer" onclick="window.open('https://console.cloud.google.com','_blank')">console.cloud.google.com</strong> → Sign in with Google</div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--green);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">2</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5">Click <strong style="color:var(--text)">Select a project → New Project</strong> → name it anything → Create</div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--green);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">3</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5">Go to <strong style="color:var(--text)">APIs & Services → Library</strong> → search <strong style="color:var(--text)">"YouTube Data API v3"</strong> → Enable it</div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--green);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">4</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5">Go to <strong style="color:var(--text)">APIs & Services → Credentials → Create Credentials → API Key</strong></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--green);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">5</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5">✅ Copy the key → paste below → done!</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:14px;margin-bottom:16px;font-size:12px;color:var(--muted);line-height:1.6">
+      💡 <strong style="color:var(--text)">Completely free:</strong> 10,000 units/day. Each search = 100 units = <strong style="color:var(--green)">100 searches/day free</strong>. No credit card needed.
+    </div>
+
+    <input id="kinput" type="text" placeholder="Paste your API key here  e.g. AIzaSyB..." 
+      style="width:100%;background:var(--s2);border:1.5px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;outline:none;margin-bottom:12px"
+      onkeydown="if(event.key==='Enter')saveKey()"/>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="saveKey()" style="flex:1;background:var(--green);color:#000;border:none;border-radius:10px;padding:12px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer">✅ Save & Start Listening</button>
+      <button onclick="window.open('https://console.cloud.google.com','_blank')" style="background:var(--s3);color:var(--text);border:none;border-radius:10px;padding:12px 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Open Google</button>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--dim)">Key is saved only in your browser — never shared</div>
+  </div>
+</div>
 
 <!-- DEPLOY MODAL -->
 <div id="dmodal" onclick="if(event.target===this)closeDeploy()">
@@ -472,6 +519,7 @@ img{display:block}
       <input type="text" id="sinput" placeholder="Search songs, artists, albums..." autocomplete="off"/>
     </div>
     <button class="sbtn" onclick="doSearch()">Search</button>
+    <button class="dbtn" id="keybtn" onclick="showKeyModal()" style="border-color:rgba(30,215,96,.4);color:var(--green)">🔑 API Key</button>
     <button class="dbtn" onclick="openDeploy()">🚀 Deploy Free</button>
   </header>
 
@@ -620,6 +668,7 @@ img{display:block}
     <div class="ni" id="mni-search" onclick="mobileTab('search')"><span class="ni-icon">⌕</span><span class="ni-lbl">Search</span></div>
     <div class="ni" id="mni-genres" onclick="mobileTab('genres')"><span class="ni-icon">♪</span><span class="ni-lbl">Genres</span></div>
     <div class="ni" id="mni-deploy" onclick="openDeploy()"><span class="ni-icon">🚀</span><span class="ni-lbl">Deploy</span></div>
+    <div class="ni" onclick="showKeyModal()"><span class="ni-icon">🔑</span><span class="ni-lbl">API Key</span></div>
   </nav>
 
 </div>
@@ -749,68 +798,78 @@ function playSong(i){
 // ═══════════════════════════════════
 // SEARCH — Invidious
 // ═══════════════════════════════════
-// ── Piped API instances (primary — best CORS support)
-const PIPED=['https://pipedapi.kavin.rocks','https://pipedapi.tokhmi.xyz','https://piped-api.garudalinux.org','https://api.piped.yt'];
-// ── Invidious fallback
-const INVIDIOUS=['https://invidious.io.lol','https://iv.datura.network','https://yt.cdaut.de','https://invidious.privacydev.net'];
+// ── YouTube Data API v3 (official, CORS-safe, 100% reliable)
+let YT_KEY=localStorage.getItem('sv_ytkey')||'';
 
 async function ytSearch(q){
-  // 1. Try Piped instances
-  for(const h of PIPED){
-    try{
-      const r=await fetch(`${h}/search?q=${encodeURIComponent(q)}&filter=videos`,{signal:AbortSignal.timeout(7000)});
-      if(!r.ok)continue;
-      const d=await r.json();
-      const items=d?.items||d?.results||[];
-      if(items.length){
-        return items.slice(0,24).map(v=>({
-          videoId:(v.url||v.videoId||'').replace('/watch?v=',''),
-          title:v.title||'Unknown',
-          author:v.uploaderName||v.author||'Unknown',
-          lengthSeconds:v.duration||0,
-          videoThumbnails:[{quality:'medium',url:v.thumbnail||`https://i.ytimg.com/vi/${(v.url||'').replace('/watch?v=','')}/mqdefault.jpg`}]
-        })).filter(v=>v.videoId);
-      }
-    }catch{continue}
-  }
-  // 2. Try Invidious fallback
-  for(const h of INVIDIOUS){
-    try{
-      const r=await fetch(`${h}/api/v1/search?q=${encodeURIComponent(q)}&type=video&fields=videoId,title,author,lengthSeconds,videoThumbnails`,{signal:AbortSignal.timeout(7000)});
-      if(!r.ok)continue;
-      const d=await r.json();
-      if(Array.isArray(d)&&d.length)return d.slice(0,24);
-    }catch{continue}
-  }
-  // 3. CORS proxy fallback over Invidious
+  if(!YT_KEY){showKeyModal();return null;}
   try{
-    const target=`https://invidious.io.lol/api/v1/search?q=${encodeURIComponent(q)}&type=video&fields=videoId,title,author,lengthSeconds,videoThumbnails`;
-    const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(target)}`,{signal:AbortSignal.timeout(8000)});
-    if(r.ok){const w=await r.json();const d=JSON.parse(w.contents||'[]');if(Array.isArray(d)&&d.length)return d.slice(0,24);}
-  }catch{}
-  return null;
+    const url=`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=24&q=${encodeURIComponent(q)}&type=video&videoCategoryId=10&key=${YT_KEY}`;
+    const r=await fetch(url,{signal:AbortSignal.timeout(8000)});
+    if(r.status===400||r.status===403){
+      const e=await r.json();
+      if(e?.error?.message){toast('❌ '+e.error.message.slice(0,60));showKeyModal('invalid');return null;}
+    }
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    return (d.items||[]).map(v=>({
+      videoId:v.id.videoId,
+      title:v.snippet.title,
+      author:v.snippet.channelTitle,
+      lengthSeconds:0,
+      videoThumbnails:[{quality:'medium',url:v.snippet.thumbnails?.medium?.url||v.snippet.thumbnails?.default?.url||''}]
+    })).filter(v=>v.videoId);
+  }catch(e){toast('Search error: '+e.message);return null;}
 }
 
 async function doSearch(){
   const q=$('sinput').value.trim();
   if(!q)return;
+  if(!YT_KEY){showKeyModal();return;}
   await sgenre(q,`"${q}"`);
 }
 $('sinput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
 
 async function sgenre(q,label){
+  if(!YT_KEY){showKeyModal();return;}
   $('sinput').value=q;
   document.querySelectorAll('.gb').forEach(b=>b.classList.remove('on'));
   $('homeview').style.display='none';$('resultsview').style.display='block';
   $('rtitle').textContent=label||q;
-  $('rsub').textContent='Streaming via YouTube · Any song, any language';
+  $('rsub').textContent='Powered by YouTube Data API · Any song, any language';
   $('rcontainer').innerHTML=`<div class="ld"><div class="sp">◌</div><span style="font-size:13px;color:var(--muted)">Searching...</span></div>`;
   mobileTab('search');
   const res=await ytSearch(q);
-  if(!res?.length){$('rcontainer').innerHTML=`<div class="em"><span style="font-size:44px">🌐</span><span style="font-size:16px;font-weight:700">API unreachable</span><span style="font-size:12px;text-align:center;line-height:1.6">Free YouTube API is temporarily down.<br/>Try again in a few seconds.</span><button onclick="sgenre(document.getElementById('sinput').value,'Retrying...')" style="margin-top:12px;background:var(--green);color:#000;border:none;border-radius:20px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer">↻ Retry</button></div>`;return}
+  if(!res?.length){
+    if(YT_KEY)$('rcontainer').innerHTML=`<div class="em"><span style="font-size:44px">🎵</span><span style="font-size:16px;font-weight:700">No results found</span><span>Try different keywords</span><button onclick="sgenre(document.getElementById('sinput').value,'Retrying...')" style="margin-top:12px;background:var(--green);color:#000;border:none;border-radius:20px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer">↻ Retry</button></div>`;
+    return;
+  }
   Q=res.map(r=>({id:r.videoId,title:r.title,artist:r.author,thumb:r.videoThumbnails?.find(t=>t.quality==='medium')?.url||r.videoThumbnails?.[0]?.url||'',duration:r.lengthSeconds||0}));
   buildCards('rcontainer');
 }
+
+// ── API Key Modal
+function showKeyModal(state){
+  $('kmodal').classList.add('open');
+  if(state==='invalid'){
+    $('kmodal-title').textContent='❌ Invalid API Key';
+    $('kmodal-sub').textContent='Your key was rejected by YouTube. Please check and re-enter it.';
+    $('kinput').style.borderColor='#e74c3c';
+  }
+}
+function closeKeyModal(){$('kmodal').classList.remove('open')}
+function saveKey(){
+  const k=$('kinput').value.trim();
+  if(!k){toast('Please enter your API key');return;}
+  YT_KEY=k;localStorage.setItem('sv_ytkey',k);
+  closeKeyModal();
+  toast('✅ API key saved! Loading music...');
+  const kb=$('keybtn');if(kb){kb.textContent='✅ Key Saved';kb.style.borderColor='rgba(30,215,96,.6)';}
+  const q=$('sinput').value.trim();
+  if(q)sgenre(q,`"${q}"`);else init();
+}
+function clearKey(){YT_KEY='';localStorage.removeItem('sv_ytkey');showKeyModal();toast('Key cleared');}
+$('sinput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
 
 function buildCards(cid){
   const wrap=document.getElementById(cid);
@@ -967,6 +1026,7 @@ function toast(m){const el=$('toast');el.textContent=m;el.classList.add('on');cl
 
 // ─ Init
 async function init(){
+  if(!YT_KEY){showKeyModal();return;}
   const res=await ytSearch('bollywood trending hits 2024');
   if(res?.length){
     Q=res.map(r=>({id:r.videoId,title:r.title,artist:r.author,thumb:r.videoThumbnails?.find(t=>t.quality==='medium')?.url||r.videoThumbnails?.[0]?.url||'',duration:r.lengthSeconds||0}));
